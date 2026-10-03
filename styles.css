@@ -1,0 +1,481 @@
+:root {
+  --sky-top: #e8f4fc;
+  --sky-mid: #c5cae9;
+  --sky-bottom: #f5d78e;
+  --indigo: #2d3561;
+  --indigo-deep: #1a1f3a;
+  --white: #ffffff;
+  --caption-h: clamp(7rem, 32vh, 20rem);
+  --font-display: "Manrope", system-ui, sans-serif;
+  --font-body: "Literata", Georgia, serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overflow-x: clip;
+  overscroll-behavior: none;
+  background: var(--indigo-deep);
+  color: var(--white);
+  font-family: var(--font-body);
+  /* Keep horizontal pans from scrolling the page under the fixed topbar (iOS Safari). */
+  touch-action: pan-y pinch-zoom;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  background: var(--white);
+  color: var(--indigo-deep);
+}
+
+.skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+}
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+  pointer-events: none;
+}
+
+.topbar__brand,
+.topbar__counter {
+  color: rgba(26, 31, 58, 0.92);
+  text-shadow:
+    0 0 1px rgba(255, 255, 255, 0.95),
+    0 1px 2px rgba(255, 255, 255, 0.9),
+    0 2px 10px rgba(255, 255, 255, 0.75),
+    0 1px 4px rgba(45, 53, 97, 0.25);
+}
+
+.topbar a,
+.topbar__counter {
+  pointer-events: auto;
+}
+
+.topbar__vk {
+  color: #b8860b;
+  text-decoration: none;
+  text-shadow:
+    0 0 1px rgba(255, 255, 255, 0.85),
+    0 1px 4px rgba(26, 31, 58, 0.55),
+    0 2px 12px rgba(26, 31, 58, 0.35);
+}
+
+.topbar__vk:hover,
+.topbar__vk:focus-visible {
+  text-decoration: underline;
+}
+
+.deck {
+  position: relative;
+  /* 100% of the layout viewport — avoid 100vw (includes scrollbar / can overflow on iOS). */
+  width: 100%;
+  max-width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  overflow-x: clip;
+  touch-action: pan-y;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 1fr var(--caption-h);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.55s ease, visibility 0.55s;
+}
+
+.slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  z-index: 1;
+}
+
+.slide__share {
+  position: absolute;
+  top: max(3.15rem, calc(env(safe-area-inset-top) + 2.35rem));
+  right: max(1rem, env(safe-area-inset-right));
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  background: rgba(26, 31, 58, 0.82);
+  backdrop-filter: blur(10px);
+  color: var(--white);
+  cursor: pointer;
+  box-shadow:
+    0 2px 12px rgba(26, 31, 58, 0.45),
+    0 0 0 1px rgba(26, 31, 58, 0.25);
+  transition: background 0.2s, transform 0.15s, border-color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.slide__share:hover {
+  background: var(--indigo);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.slide__share:focus-visible {
+  outline: 2px solid var(--sky-bottom);
+  outline-offset: 2px;
+}
+
+.slide__share:active {
+  transform: scale(0.94);
+}
+
+.slide__share-icon {
+  display: block;
+  width: 1.15rem;
+  height: 1.15rem;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+}
+
+.share-toast {
+  position: fixed;
+  left: 50%;
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+  z-index: 50;
+  margin: 0;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--white);
+  background: rgba(26, 31, 58, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 0.5rem);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.share-toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+body.is-lightbox-open .share-toast {
+  z-index: 110;
+}
+
+.slide__sky {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 255, 255, 0.9) 0%, transparent 70%),
+    linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 45%, #b8c5e8 70%, var(--sky-bottom) 100%);
+  z-index: 0;
+}
+
+.slide__frame {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3.5rem 2rem 1rem;
+  min-height: 0;
+}
+
+.slide__img {
+  /* Cap to parent width so vw quirks cannot push the slide past the viewport. */
+  max-width: min(78%, 1100px);
+  max-height: min(58vh, 620px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 0.5rem;
+  cursor: zoom-in;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow:
+    0 24px 64px rgba(45, 53, 97, 0.28),
+    0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.slide__cloud {
+  width: min(60%, 480px);
+  aspect-ratio: 2 / 1;
+  background:
+    radial-gradient(ellipse 45% 55% at 30% 55%, rgba(255, 255, 255, 0.95) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 65% 50%, rgba(255, 255, 255, 0.85) 0%, transparent 68%),
+    radial-gradient(ellipse 35% 45% at 50% 65%, rgba(255, 255, 255, 0.7) 0%, transparent 65%);
+  filter: blur(1px);
+  opacity: 0.85;
+}
+
+.slide__caption {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 1rem 1.5rem 1.75rem;
+  background: linear-gradient(180deg, rgba(26, 31, 58, 0) 0%, rgba(26, 31, 58, 0.88) 35%, var(--indigo-deep) 100%);
+  text-align: center;
+}
+
+.slide__text {
+  margin: 0;
+  max-width: 22ch;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, min(4.4vw, 4.6vh), 3rem);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
+}
+
+.slide__link {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sky-bottom);
+  text-decoration: none;
+  opacity: 0.7;
+}
+
+.slide__link:hover,
+.slide__link:focus-visible {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.nav {
+  position: fixed;
+  bottom: calc(var(--caption-h) + 0.5rem);
+  right: 1.25rem;
+  z-index: 30;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nav__btn {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: none;
+  border-radius: 50%;
+  background: rgba(26, 31, 58, 0.75);
+  backdrop-filter: blur(8px);
+  color: var(--white);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.nav__btn:hover {
+  background: var(--indigo);
+}
+
+.nav__btn:focus-visible {
+  outline: 2px solid var(--sky-bottom);
+  outline-offset: 2px;
+}
+
+.nav__btn:active {
+  transform: scale(0.94);
+}
+
+@media (max-width: 640px) {
+  :root {
+    --caption-h: clamp(6.5rem, 28vh, 9rem);
+  }
+
+  .slide__frame {
+    padding: 3rem 1rem 0.5rem;
+  }
+
+  .slide__text {
+    max-width: 22ch;
+    font-size: clamp(1.35rem, 6vw, 2rem);
+  }
+
+  .nav {
+    bottom: calc(var(--caption-h) + 0.25rem);
+    right: 0.75rem;
+  }
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
+    max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  background: rgba(10, 12, 22, 0.96);
+  touch-action: manipulation;
+}
+
+.lightbox[hidden] {
+  display: none;
+}
+
+.lightbox__close {
+  position: absolute;
+  top: max(0.75rem, env(safe-area-inset-top));
+  right: max(0.75rem, env(safe-area-inset-right));
+  z-index: 2;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--white);
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.lightbox__close:hover,
+.lightbox__close:focus-visible {
+  background: rgba(255, 255, 255, 0.22);
+  outline: 2px solid var(--sky-bottom);
+  outline-offset: 2px;
+}
+
+.lightbox__nav {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 max(0.35rem, env(safe-area-inset-left)) 0
+    max(0.35rem, env(safe-area-inset-right));
+  pointer-events: none;
+}
+
+.lightbox__nav-btn {
+  pointer-events: auto;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 50%;
+  background: rgba(26, 31, 58, 0.82);
+  backdrop-filter: blur(10px);
+  color: var(--white);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(0, 0, 0, 0.2);
+  transition: background 0.2s, transform 0.15s, border-color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.lightbox__nav-btn:hover {
+  background: var(--indigo);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.lightbox__nav-btn:focus-visible {
+  outline: 2px solid var(--sky-bottom);
+  outline-offset: 2px;
+}
+
+.lightbox__nav-btn:active {
+  transform: scale(0.94);
+}
+
+.lightbox__stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 0;
+  cursor: zoom-out;
+}
+
+.lightbox__img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 0.25rem;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+  cursor: default;
+  pointer-events: none;
+}
+
+.lightbox__caption {
+  margin: 0;
+  max-width: 36ch;
+  padding: 0 0.5rem 0.25rem;
+  font-family: var(--font-display);
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+body.is-lightbox-open .nav {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide {
+    transition: none;
+  }
+
+  .share-toast {
+    transition: none;
+  }
+}
